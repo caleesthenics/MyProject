@@ -3,15 +3,13 @@ import time
 
 def main(page: ft.Page):
     page.title = 'Training Program'
-
     page.scroll = 'auto'
-
-    progress = ft.ProgressBar(width=100,value = 0,visible= False)
-
+    page.vertical_alignment = ft.MainAxisAlignment.CENTER
     page.theme_mode = ft.ThemeMode.DARK
-
     page.window.width =460
     page.window.height = 600
+
+    progress = ft.ProgressBar(width=100,value = 0,visible= False)
 
     start_text = ft.Text('This program will help you increase your one-rep max in 12 weeks')
 
@@ -141,9 +139,9 @@ def main(page: ft.Page):
 
 
 
-    button = ft.ElevatedButton('Generate',on_click = program)
+    gen_button = ft.ElevatedButton('Generate',on_click = program)
  
-    button1 = ft.IconButton(icon = ft.Icons.SUNNY,on_click = theme_button)
+    t_button = ft.IconButton(icon = ft.Icons.SUNNY,on_click = theme_button)
 
     button2 = ft.ElevatedButton('Clear',on_click= clear)
 
@@ -154,11 +152,14 @@ def main(page: ft.Page):
 
     page.add(ft.Row([start_text], alignment= ft.MainAxisAlignment.CENTER),
              ft.Row([current_max], alignment= ft.MainAxisAlignment.CENTER),
-             ft.Row([button, button2,button3, button1], alignment= ft.MainAxisAlignment.CENTER),
+             ft.Row([t_button, button2,button3, gen_button], alignment= ft.MainAxisAlignment.CENTER),
              ft.Row([progress], alignment= ft.MainAxisAlignment.CENTER),
              ft.Row([error_text], alignment= ft.MainAxisAlignment.CENTER),
              ft.Row([programm_text], alignment= ft.MainAxisAlignment.CENTER),
              ft.Row([programm_text1,programm_text2], alignment= ft.MainAxisAlignment.CENTER),
              ft.Row([programm_text3], alignment= ft.MainAxisAlignment.CENTER))
+
+
+
 
 ft.app(target = main)
