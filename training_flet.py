@@ -3,161 +3,174 @@ import time
 
 def main(page: ft.Page):
     page.title = 'Training Program'
-    page.scroll = 'auto'
-    page.vertical_alignment = ft.MainAxisAlignment.CENTER
+    page.bgcolor = '#43464B'
+    page.vertical_alignment = ft.alignment.center
     page.theme_mode = ft.ThemeMode.DARK
     page.window.width =460
     page.window.height = 600
+
+    
 
     progress = ft.ProgressBar(width=100,value = 0,visible= False)
 
     start_text = ft.Text('This program will help you increase your one-rep max in 12 weeks')
 
     programm_text = ft.Text('')
-    programm_text1 = ft.Text('')
-    programm_text2 = ft.Text('')
-    programm_text3 = ft.Text('')
-
-    error_text = ft.Text(color= ft.Colors.RED)
-
-    week = []
-    percent = []
-    sets = []
-    reps = []
-    working_weight = []
 
     def round_to_five(weight):
         return round(weight / 5) * 5
 
+    def round_to_nearest_2_5(x):
+        return round(x / 2.5) * 2.5
+
+    def format_weight(w):
+        if w.is_integer():
+            return int(w)
+        return w
+    
     def program(_):
-        error_text.value = ''
-        try:
-            current_weight = float(current_max.value)
-        except:
-            error_text.value = 'Please enter a number only'
-            programm_text.value = ''
-            programm_text1.value = ''
-            programm_text2.value = ''
-            programm_text3.value = ''
-            page.update()
-            return
         
         progress.visible = True
 
-        programm_text.value = ''
-        programm_text1.value = ''
-        programm_text2.value = ''
-        programm_text3.value = ''
+        programma = {
+            '1week': [70, 5, 5],
+            '2week': [72.5, 5, 5],
+            '3week': [75, 4, 5],
+            '4week': [85, 3, 3],
+            '5week': [88, 4, 2],
+            '6week': [70, 3, 5],
+            '7week': [77.5, 5, 4],
+            '8week': [87.5, 3, 2],
+            '9week': [90, 3, 2],
+            '10week': [70, 3, 3],
+            '11week': [85, 2, 2],
+            '12week': [105, 1, 1]
+        }
 
-        plan = [{"week": 1, "percent": 70, "sets": 5, "reps": 5},
-        {"week": 2, "percent": 72.5, "sets": 5, "reps": 5},
-        {"week": 3, "percent": 75, "sets": 4, "reps": 5},
-        {"week": 4, "percent": 85, "sets": 3, "reps": 3},
-        {"week": 5, "percent": 88, "sets": 4, "reps": 2},
-        {"week": 6, "percent": 70, "sets": 3, "reps": 5},
-        {"week": 7, "percent": 77.5, "sets": 5, "reps": 4},
-        {"week": 8, "percent": 87.5, "sets": 3, "reps": 2},
-        {"week": 9, "percent": 90, "sets": 3, "reps": 2},
-        {"week": 10, "percent": 70, "sets": 3, "reps": 3},
-        {"week": 11, "percent": 85, "sets": 2, "reps": 2},
-        {"week": 12, "percent": 105, "sets": 1, "reps": 1},]
-        
-        programm_text.value = 'Training plan for 12 weeks:\n'
+        max_lift = float(current_max.value)
 
-        for i,week_data in enumerate(plan[:6]):
-            week = week_data["week"]
-            percent = week_data["percent"]
-            sets = week_data["sets"]
-            reps = week_data["reps"]
-            weight = round(current_weight * percent / 100, 1)
-            working_weight = round_to_five(weight)
-            programm_text1.value += (f"\nWeek №{week}."
-            f"\n{percent}% of one-rep max"
-            f"\nSets: {sets}, Reps: {reps}"
-            f"\nWorking weight: {working_weight}kg")
-            progress.value = (i + 1) / len(plan)
-            time.sleep(0.5)
+        total = len(programma)
+
+        new_programma = {}
+        for i,(week, values) in enumerate(programma.items()):
+            percent = values[0] / 100
+            sets = values[1]
+            reps = values[2]
+            weight = max_lift * percent
+            rounded_weight = round_to_nearest_2_5(weight)
+            rounded_weight = format_weight(rounded_weight)
+            new_programma[week] = [rounded_weight, sets, reps]
+            progress.value = (i + 1) / total
+            time.sleep(0.3)
             page.update()
         
-        for i,week_data in enumerate(plan[6:]):
-            week = week_data["week"]
-            percent = week_data["percent"]
-            sets = week_data["sets"]
-            reps = week_data["reps"]
-            weight = round(current_weight * percent / 100, 1)
-            working_weight = round_to_five(weight)
-            programm_text2.value += (f"\nWeek №{week}."
-            f"\n{percent}% of one-rep max"
-            f"\nSets: {sets}, Reps: {reps}"
-            f"\nWorking weight: {working_weight}kg")
-            progress.value = (i + 7) / len(plan)
-            time.sleep(0.5)
-            page.update() 
-        
-        programm_text3.value = (f'\nOn the last training session:'
-        f'\nU can try 110% if 105% is done: {round_to_five(current_weight / 100 * 110)}Kg')
-        
+        programm_text.value = f'1st week: {new_programma['1week'][0]}kg, podhodov {new_programma['1week'][1]}, povtorov{new_programma["1week"][2]}'
+            
         current_max.value = ''
-        error_text.value = ''
         progress.value = 1
-        progress.visible = False
+        if progress.value == 1:
+            progress.visible = False
+            gen_button.disabled = True
+            navigation2.visible = True
         page.update()
         
-    def clear(_):
-        if programm_text3.value != '':
-            error_text.value = ''
-            programm_text.value = ''
-            programm_text1.value = ''
-            programm_text2.value = ''
-            programm_text3.value = ''
-            progress.value = 0
-        else:
-            error_text.value = 'Generate first or wait until its finished'
-            error_text.color = ft.Colors.RED
-        page.update()
+    # def clear(_):
+    #     if programm_text3.value != '':
+    #         error_text.value = ''
+    #         programm_text.value = ''
+    #         programm_text1.value = ''
+    #         programm_text2.value = ''
+    #         programm_text3.value = ''
+    #         progress.value = 0
+    #     else:
+    #         error_text.value = 'Generate first or wait until its finished'
+    #         error_text.color = ft.Colors.RED
+    #     page.update()
     
-    def theme_button(_):
-        if page.theme_mode == ft.ThemeMode.LIGHT:
-            page.theme_mode = ft.ThemeMode.DARK
-        else:
-            page.theme_mode = ft.ThemeMode.LIGHT
-        page.update()
     
-    def TXT(_):
-        with open('Training.txt','w') as file:
-            if programm_text3.value != '':
-                file.write("Training plan for 12 weeks:\n")
-                file.write(programm_text1.value + "\n")
-                file.write(programm_text2.value + "\n")
-                file.write(programm_text3.value + "\n")
-                error_text.value = 'File saved as Training.txt'
-                error_text.color = ft.Colors.WHITE
-            else:
-                error_text.value = 'Generate first to save it'
-                error_text.color = ft.Colors.RED
-            page.update()
+    # def TXT(_):
+    #     with open('Training.txt','w') as file:
+    #         if programm_text3.value != '':
+    #             file.write("Training plan for 12 weeks:\n")
+    #             file.write(programm_text1.value + "\n")
+    #             file.write(programm_text2.value + "\n")
+    #             file.write(programm_text3.value + "\n")
+    #             error_text.value = 'File saved as Training.txt'
+    #             error_text.color = ft.Colors.WHITE
+    #         else:
+    #             error_text.value = 'Generate first to save it'
+    #             error_text.color = ft.Colors.RED
+    #         page.update()
+    
+    def test(_):
+        value = current_max.value
+        try:
+            float(value)
+            gen_button.disabled = False
+        except:
+            gen_button.disabled = True
+        page.update()
 
 
 
-    gen_button = ft.ElevatedButton('Generate',on_click = program)
+    gen_button = ft.ElevatedButton('Generate',on_click = program, disabled= True)
  
-    t_button = ft.IconButton(icon = ft.Icons.SUNNY,on_click = theme_button)
+    # button2 = ft.ElevatedButton('Clear',on_click= clear)
 
-    button2 = ft.ElevatedButton('Clear',on_click= clear)
+    # button3 = ft.ElevatedButton('Convert to TXT',on_click = TXT)
 
-    button3 = ft.ElevatedButton('Convert to TXT',on_click = TXT)
-
-    current_max = ft.TextField(label = 'Input your current one-rep max',on_submit= program)
+    current_max = ft.TextField(label = 'Input your current one-rep max',on_submit= program, on_change= test)
 
 
-    page.add(ft.Row([start_text], alignment= ft.MainAxisAlignment.CENTER),
-             ft.Row([current_max], alignment= ft.MainAxisAlignment.CENTER),
-             ft.Row([t_button, button2,button3, gen_button], alignment= ft.MainAxisAlignment.CENTER),
-             ft.Row([progress], alignment= ft.MainAxisAlignment.CENTER),
-             ft.Row([error_text], alignment= ft.MainAxisAlignment.CENTER),
-             ft.Row([programm_text], alignment= ft.MainAxisAlignment.CENTER),
-             ft.Row([programm_text1,programm_text2], alignment= ft.MainAxisAlignment.CENTER),
-             ft.Row([programm_text3], alignment= ft.MainAxisAlignment.CENTER))
+    page_one = ft.Column(
+        [
+            start_text,
+            current_max,
+            gen_button,
+            progress
+        ],
+        alignment=ft.MainAxisAlignment.CENTER,
+        horizontal_alignment=ft.CrossAxisAlignment.CENTER
+    )
+
+    page_two = ft.Column(
+        [
+            programm_text
+        ],
+        alignment=ft.MainAxisAlignment.CENTER,
+        horizontal_alignment=ft.CrossAxisAlignment.CENTER
+    )
+
+    page1 = ft.Container(
+        page_one,
+        alignment=ft.alignment.center,
+        expand=True
+    )
+
+    page2 = ft.Container(
+        page_two,
+        alignment=ft.alignment.center,
+        expand=True
+    )
+
+    def navigate(_):
+        index = page.navigation_bar.selected_index
+        page.clean()
+        if index == 0:
+            page.add(page1)
+        elif index == 1:
+            page.add(page2)
+    
+    navigation1 = ft.NavigationBarDestination(icon=ft.Icons.ABC ,label = '1st page')
+    navigation2 = ft.NavigationBarDestination(icon=ft.Icons.ABC, label = '2nd page',visible= False)
+
+    page.navigation_bar = ft.NavigationBar(
+        destinations=[
+            navigation1,navigation2
+        ],on_change= navigate
+    )
+
+    page.add(page1)
 
 
 
